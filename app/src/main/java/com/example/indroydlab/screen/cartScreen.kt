@@ -156,6 +156,10 @@ fun PriceSummary(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
+            Text(text = "Minimum Checkout Amount ₹1000",
+                fontSize = 18.sp,
+                color = Color(0xFFD32F2F))
+
             SummaryRow("Subtotal", subTotal)
             SummaryRow("Tax", taxTotal)
             SummaryRow("Coupon Discount", -discount)

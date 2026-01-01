@@ -1,5 +1,6 @@
 package com.example.indroydlab.screen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,11 +10,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.indroydlab.cart.CartManager
-import com.example.indroydlab.model.CartItem
+import com.example.indroydlab.model.Cart_item
 import com.airbnb.lottie.compose.*
 import com.example.indroydlab.R
 import kotlinx.coroutines.delay
@@ -21,10 +23,10 @@ import kotlinx.coroutines.delay
 @Composable
 fun CartScreen(cartManager: CartManager) {
 
-    var refresh by remember { mutableStateOf(0) }
+    var refresh = remember { mutableIntStateOf(0) }
     var isOrderPlaced by remember { mutableStateOf(false) }
 
-    val cartItems = remember(refresh) { cartManager.getCartItems() }
+    val cartItems = remember(refresh.intValue) { cartManager.getCartItems() }
 
     if (isOrderPlaced) {
         CheckoutSuccessScreen(
@@ -72,17 +74,24 @@ fun CartScreen(cartManager: CartManager) {
                 ) { item ->
                     CartItemCard(
                         item = item,
+                        onIncrease = {
+                            cartManager.increaseQuantity(item.product)
+                            refresh.intValue++},
+
+                        onDecrease = {
+                            cartManager.decreaseQuantity(item.product)
+                                     refresh.intValue++},
+
                         onRemove = {
                             cartManager.removeFromCart(item.product)
-                            refresh++
-                        }
+                        refresh.intValue++}
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            PriceSummary(cartManager,refresh)
+            PriceSummary(cartManager,refresh.intValue)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -90,7 +99,7 @@ fun CartScreen(cartManager: CartManager) {
                 onClick = {
                     if (cartManager.finalAmount >= 1000) {
                         cartManager.clearCart()
-                        refresh++
+
                         isOrderPlaced = true
                     }
                 },
@@ -103,10 +112,12 @@ fun CartScreen(cartManager: CartManager) {
         }
     }
 }
-
+@SuppressLint("DefaultLocale")
 @Composable
 fun CartItemCard(
-    item: CartItem,
+    item: Cart_item,
+    onIncrease: () -> Unit,
+    onDecrease: () -> Unit,
     onRemove: () -> Unit
 ) {
     Card(
@@ -117,9 +128,9 @@ fun CartItemCard(
 
             Text(text = item.product.name, fontSize = 16.sp)
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-            Text(text = "Price: ₹${item.itemPrice}")
+            Text(text = "Price: ₹${String.format("%.2f", item.itemPrice)}")
             Text(text = "Quantity: ${item.quantity}")
             Text(
                 text = "Tax: ${item.product.taxPercent}%",
@@ -129,9 +140,28 @@ fun CartItemCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(
-                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                    IconButton(onClick = onDecrease) {
+                        Text("−", fontSize = 20.sp)
+                    }
+
+                    Text(
+                        text = item.quantity.toString(),
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+
+                    IconButton(onClick = onIncrease) {
+                        Text("+", fontSize = 20.sp)
+                    }
+                }
+
                 TextButton(onClick = onRemove) {
                     Text("Remove", color = MaterialTheme.colorScheme.error)
                 }
@@ -139,6 +169,7 @@ fun CartItemCard(
         }
     }
 }
+
 
 @Composable
 fun PriceSummary(
@@ -176,7 +207,7 @@ fun PriceSummary(
         }
     }
 }
-
+@SuppressLint("DefaultLocale")
 @Composable
 fun SummaryRow(
     label: String,
@@ -189,11 +220,11 @@ fun SummaryRow(
     ) {
         Text(
             text = label,
-            fontWeight = if (isBold) androidx.compose.ui.text.font.FontWeight.Bold else null
+            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal
         )
         Text(
             text = "₹${String.format("%.2f", value)}",
-            fontWeight = if (isBold) androidx.compose.ui.text.font.FontWeight.Bold else null
+            fontWeight = if (isBold) FontWeight.Bold else FontWeight.Normal
         )
     }
 }

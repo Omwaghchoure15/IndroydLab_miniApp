@@ -101,8 +101,12 @@ fun ProductCard(product: Product, cartManager: CartManager) {
             ) {
                 Text("Add to Cart")
             }
+            Spacer(modifier = Modifier.height(10.dp))
+
+
+
+            }
         }
     }
-}
 
 

@@ -26,7 +26,7 @@ fun CartScreen(cartManager: CartManager) {
     var refresh = remember { mutableIntStateOf(0) }
     var isOrderPlaced by remember { mutableStateOf(false) }
 
-    val cartItems = remember(refresh.intValue) { cartManager.getCartItems() }
+    val cartItems = remember(refresh.intValue) { cartManager.cartItems }
 
     if (isOrderPlaced) {
         CheckoutSuccessScreen(
@@ -112,6 +112,7 @@ fun CartScreen(cartManager: CartManager) {
         }
     }
 }
+
 @SuppressLint("DefaultLocale")
 @Composable
 fun CartItemCard(
@@ -235,6 +236,7 @@ fun CartScreenPreview() {
     val cartManager = CartManager()
     CartScreen(cartManager)
 }
+
 @Composable
 fun CheckoutSuccessScreen(onDone: () -> Unit) {
     LaunchedEffect(Unit)

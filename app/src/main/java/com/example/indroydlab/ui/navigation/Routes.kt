@@ -1,4 +1,4 @@
-package com.example.indroydlab
+package com.example.indroydlab.ui.navigation
 
 object Routes {
 

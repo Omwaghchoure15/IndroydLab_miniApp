@@ -1,6 +1,7 @@
-package com.example.indroydlab.screen
+package com.example.indroydlab.ui.screen
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,10 +21,17 @@ import com.airbnb.lottie.compose.*
 import com.example.indroydlab.R
 import kotlinx.coroutines.delay
 
+
+@Preview(showBackground = true)
+@Composable
+fun CartScreenPreview() {
+    val cartManager = CartManager()
+    CartScreen(cartManager)
+}
 @Composable
 fun CartScreen(cartManager: CartManager) {
 
-    var refresh = remember { mutableIntStateOf(0) }
+    val refresh = remember { mutableIntStateOf(0) }
     var isOrderPlaced by remember { mutableStateOf(false) }
 
     val cartItems = remember(refresh.intValue) { cartManager.cartItems }
@@ -36,6 +44,8 @@ fun CartScreen(cartManager: CartManager) {
         )
         return
     }
+
+
 
     Column(
         modifier = Modifier
@@ -108,7 +118,6 @@ fun CartScreen(cartManager: CartManager) {
             ) {
                 Text("Checkout")
             }
-
         }
     }
 }
@@ -125,8 +134,10 @@ fun CartItemCard(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(3.dp)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-
+        Column(modifier = Modifier
+            .padding(12.dp)
+            .background(MaterialTheme.colorScheme.background)
+        ) {
             Text(text = item.product.name, fontSize = 16.sp)
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -190,7 +201,7 @@ fun PriceSummary(
 
             Text(text = "Minimum Checkout Amount ₹1000",
                 fontSize = 18.sp,
-                color = Color(0xFFD32F2F))
+                color = MaterialTheme.colorScheme.tertiary)
 
             SummaryRow("Subtotal", subTotal)
             SummaryRow("Tax", taxTotal)
@@ -230,13 +241,6 @@ fun SummaryRow(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun CartScreenPreview() {
-    val cartManager = CartManager()
-    CartScreen(cartManager)
-}
-
 @Composable
 fun CheckoutSuccessScreen(onDone: () -> Unit) {
     LaunchedEffect(Unit)
@@ -246,7 +250,10 @@ fun CheckoutSuccessScreen(onDone: () -> Unit) {
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.confetti)
     )
-    Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFF52CC59)) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.secondary
+    ) {
         Box(
             contentAlignment = Alignment.Center
         ) {
@@ -255,7 +262,9 @@ fun CheckoutSuccessScreen(onDone: () -> Unit) {
                 iterations = 1
             )
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
                 Text(
                     text = "🎉",

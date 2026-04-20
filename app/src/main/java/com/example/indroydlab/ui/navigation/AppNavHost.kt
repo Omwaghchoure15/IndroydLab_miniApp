@@ -1,12 +1,12 @@
-package com.example.indroydlab
+package com.example.indroydlab.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.indroydlab.cart.CartManager
-import com.example.indroydlab.screen.CartScreen
-import com.example.indroydlab.screen.ProductScreen
+import com.example.indroydlab.ui.screen.CartScreen
+import com.example.indroydlab.ui.screen.ProductScreen
 
 @Composable
 fun AppNavHost() {

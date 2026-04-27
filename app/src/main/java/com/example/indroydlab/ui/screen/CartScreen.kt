@@ -15,37 +15,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.indroydlab.cart.CartManager
-import com.example.indroydlab.model.Cart_item
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.airbnb.lottie.compose.*
 import com.example.indroydlab.R
+import com.example.indroydlab.model.CartItem
+import com.example.indroydlab.ui.theme.IndroydLabTheme
+import com.example.indroydlab.ui.viewmodel.CartViewModel
 import kotlinx.coroutines.delay
 
-
-@Preview(showBackground = true)
 @Composable
-fun CartScreenPreview() {
-    val cartManager = CartManager()
-    CartScreen(cartManager)
-}
-@Composable
-fun CartScreen(cartManager: CartManager) {
+fun CartScreen(viewModel: CartViewModel) {
 
-    val refresh = remember { mutableIntStateOf(0) }
+    val cartItems = viewModel.cartItem
     var isOrderPlaced by remember { mutableStateOf(false) }
-
-    val cartItems = remember(refresh.intValue) { cartManager.cartItems }
 
     if (isOrderPlaced) {
         CheckoutSuccessScreen(
-            onDone = {
-                isOrderPlaced = false
-            }
+            onDone = { isOrderPlaced = false }
         )
         return
     }
-
-
 
     Column(
         modifier = Modifier
@@ -84,36 +73,27 @@ fun CartScreen(cartManager: CartManager) {
                 ) { item ->
                     CartItemCard(
                         item = item,
-                        onIncrease = {
-                            cartManager.increaseQuantity(item.product)
-                            refresh.intValue++},
-
-                        onDecrease = {
-                            cartManager.decreaseQuantity(item.product)
-                                     refresh.intValue++},
-
-                        onRemove = {
-                            cartManager.removeFromCart(item.product)
-                        refresh.intValue++}
+                        onIncrease = { viewModel.increaseQuantity(item.product) },
+                        onDecrease = { viewModel.decreaseQuantity(item.product) },
+                        onRemove = { viewModel.removeFromCart(item.product) }
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            PriceSummary(cartManager,refresh.intValue)
+            PriceSummary(viewModel)
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Button(
                 onClick = {
-                    if (cartManager.finalAmount >= 1000) {
-                        cartManager.clearCart()
-
+                    if (viewModel.getFinalAmount() >= 1000) {
+                        viewModel.clearCart()
                         isOrderPlaced = true
                     }
                 },
-                enabled = cartManager.finalAmount >= 1000,
+                enabled = viewModel.getFinalAmount() >= 1000,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Checkout")
@@ -125,7 +105,7 @@ fun CartScreen(cartManager: CartManager) {
 @SuppressLint("DefaultLocale")
 @Composable
 fun CartItemCard(
-    item: Cart_item,
+    item: CartItem,
     onIncrease: () -> Unit,
     onDecrease: () -> Unit,
     onRemove: () -> Unit
@@ -142,7 +122,7 @@ fun CartItemCard(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            Text(text = "Price: ₹${String.format("%.2f", item.itemPrice)}")
+            Text(text = "Price: ₹${String.format("%.2f", item.product.originalPrice)}")
             Text(text = "Quantity: ${item.quantity}")
             Text(
                 text = "Tax: ${item.product.taxPercent}%",
@@ -185,13 +165,12 @@ fun CartItemCard(
 
 @Composable
 fun PriceSummary(
-    cartManager: CartManager,
-    refresh: Int
+    viewModel: CartViewModel
 ) {
-    val subTotal = remember(refresh) { cartManager.subTotal }
-    val taxTotal = remember(refresh) { cartManager.taxTotal }
-    val discount = remember(refresh) { cartManager.couponDiscount }
-    val finalAmount = remember(refresh) { cartManager.finalAmount }
+    val subTotal = remember { viewModel.getSubTotal() }
+    val taxTotal = remember { viewModel.getTaxTotal() }
+    val discount = remember { viewModel.getCouponDiscount() }
+    val finalAmount = remember { viewModel.getFinalAmount() }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -243,10 +222,11 @@ fun SummaryRow(
 
 @Composable
 fun CheckoutSuccessScreen(onDone: () -> Unit) {
-    LaunchedEffect(Unit)
-    { delay(3000)
-        onDone() }
 
+    LaunchedEffect(Unit) {
+        delay(3000)
+        onDone()
+    }
     val composition by rememberLottieComposition(
         LottieCompositionSpec.RawRes(R.raw.confetti)
     )
@@ -254,36 +234,36 @@ fun CheckoutSuccessScreen(onDone: () -> Unit) {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.secondary
     ) {
-        Box(
-            contentAlignment = Alignment.Center
+        Box(contentAlignment = Alignment.Center
         ) {
-            LottieAnimation(
-                composition = composition,
-                iterations = 1
-            )
-
+            LottieAnimation(composition = composition, iterations = 1)
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-                Text(
-                    text = "🎉",
-                    fontSize = 60.sp
-                )
+                Text(text = "🎉", fontSize = 60.sp)
 
                 Spacer(modifier = Modifier.height(22.dp))
 
-                Text(
-                    text = "Order Placed Successfully",
-                    fontSize = 20.sp
-                )
+                Text(text = "Order Placed Successfully", fontSize = 20.sp)
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                Button(onClick = onDone) {
-                    Text("Continue Shopping")
-                }
+                Button(onClick = onDone) { Text("Continue Shopping") }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CartScreenPreview() {
+    CartScreen(viewModel = viewModel() )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CheckoutPreview(){
+    IndroydLabTheme{
+        CheckoutSuccessScreen(onDone = {})
     }
 }

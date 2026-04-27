@@ -19,24 +19,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.indroydlab.model.Product
-import com.example.indroydlab.Data.ProductRepository
-import com.example.indroydlab.cart.CartManager
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.indroydlab.ui.shared.ProductCard
 import com.example.indroydlab.ui.theme.IndroydLabTheme
+import com.example.indroydlab.ui.viewmodel.CartViewModel
+import com.example.indroydlab.ui.viewmodel.ProductViewModel
 
 @Composable
 fun ProductScreen(
-    cartManager: CartManager,
-    onCartClick: () -> Unit
+    ProductviewModel: ProductViewModel,
+    CartviewModel: CartViewModel,
+    onCartClick: () -> Unit,
+    onProductClick: (Int) -> Unit
 ) {
     var isDarkTheme by remember { mutableStateOf(false) }
-    val products = ProductRepository.getProducts()
+    val products = ProductviewModel.products
 
     IndroydLabTheme( darkTheme = isDarkTheme ) {
         Scaffold(
@@ -52,6 +53,7 @@ fun ProductScreen(
                 modifier = Modifier.padding(paddingValues)
             ) {
                 HorizontalDivider()
+
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp),
                     modifier = Modifier
@@ -59,9 +61,13 @@ fun ProductScreen(
                         .background(colorScheme.background),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(products){
-                        products ->
-                        ProductCard(product = products, cartManager = cartManager)
+                    items( products, key = {it.id}
+                    ){ products ->
+                        ProductCard(
+                            product = products,
+                            viewModel = CartviewModel,
+                            onClick = { onProductClick(products.id) }
+                        )
                     }
                 }
             }
@@ -111,59 +117,26 @@ fun TopBar(
                 }
             )
         },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = colorScheme.primary,
+            scrolledContainerColor = Color.Unspecified,
+            navigationIconContentColor = Color.Unspecified,
+            titleContentColor = colorScheme.onPrimary,
+            actionIconContentColor = Color.Unspecified
         )
     )
 }
 
-@Composable
-fun ProductCard(product: Product, cartManager: CartManager) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-
-            Text(text = product.name, fontSize = 16.sp)
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            if (product.isDiscounted) {
-                Text(
-                    text = "₹${product.originalPrice}",
-                    style = TextStyle(textDecoration = TextDecoration.LineThrough)
-                )
-                Text(
-                    text = "₹${product.discountedPrice}",
-                    color = colorScheme.secondary,
-                )
-            } else {
-                Text(text = "₹${product.originalPrice}")
-            }
-
-            Text(text = "Tax: ${product.taxPercent}%", color = colorScheme.tertiary)
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Button(
-                onClick = { cartManager.addToCart(product) },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Add to Cart")
-            }
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun ProductScreenPreview() {
     IndroydLabTheme {
         ProductScreen(
-            cartManager = CartManager(),
-            onCartClick = {}
+            ProductviewModel = viewModel(),
+            CartviewModel = viewModel(),
+            onCartClick = {},
+            onProductClick = {}
         )
     }
 }
@@ -173,14 +146,5 @@ fun ProductScreenPreview() {
 fun TopBarPreview() {
     IndroydLabTheme {
         TopBar(onCartClick = {}, darkTheme = false, onThemeToggle = {})
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProductCardPreview() {
-    IndroydLabTheme {
-        val sampleProduct = ProductRepository.getProducts()[0]
-        ProductCard(product = sampleProduct, cartManager = CartManager())
     }
 }

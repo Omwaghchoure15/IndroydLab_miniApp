@@ -1,5 +1,6 @@
 package com.example.indroydlab.ui.shared
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,20 +19,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.indroydlab.data.ProductRepository
-import com.example.indroydlab.model.CartManager
 import com.example.indroydlab.model.ProductModel
 import com.example.indroydlab.ui.theme.IndroydLabTheme
 import com.example.indroydlab.ui.viewmodel.CartViewModel
-import com.example.indroydlab.ui.viewmodel.ProductViewModel
 
 @Composable
 fun ProductCard(
     product: ProductModel,
-    viewModel: CartViewModel,
+    cartViewModel: CartViewModel,
     onClick: () -> Unit
 ) {
-    Card(modifier = Modifier.fillMaxWidth(),
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .clickable{ onClick() },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -58,7 +58,7 @@ fun ProductCard(
             Spacer(modifier = Modifier.height(10.dp))
 
             Button(
-               onClick = { viewModel.addToCart(product) },
+               onClick = { cartViewModel.addToCart(product) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Add to Cart")
@@ -74,8 +74,8 @@ fun ProductCardPreview(){
     IndroydLabTheme{
         ProductCard(
             product = product,
-            viewModel = viewModel(),
-            onClick = {}
+            cartViewModel = viewModel(),
+            onClick = { }
         )
     }
 }

@@ -8,7 +8,7 @@ import com.example.indroydlab.model.ProductModel
 
 class CartViewModel: ViewModel() {
     private val cartManager = CartManager()
-    private val  _cartItems = mutableStateListOf<CartItem>()
+    private val _cartItems = mutableStateListOf<CartItem>()
     val cartItem: List<CartItem> = _cartItems
 
     fun addToCart(product: ProductModel){

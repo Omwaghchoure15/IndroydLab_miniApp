@@ -222,7 +222,6 @@ fun SummaryRow(
 
 @Composable
 fun CheckoutSuccessScreen(onDone: () -> Unit) {
-
     LaunchedEffect(Unit) {
         delay(3000)
         onDone()
@@ -260,7 +259,7 @@ fun CartScreenPreview() {
     CartScreen(viewModel = viewModel() )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun CheckoutPreview(){
     IndroydLabTheme{

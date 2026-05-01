@@ -20,5 +20,4 @@ class ProductViewModel: ViewModel(){
     fun getProductById(id: Int): ProductModel?{
         return _products.find { it.id == id }
     }
-
 }

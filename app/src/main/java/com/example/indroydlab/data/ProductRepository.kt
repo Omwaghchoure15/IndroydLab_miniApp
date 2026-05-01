@@ -3,7 +3,6 @@ package com.example.indroydlab.data
 import com.example.indroydlab.model.ProductModel
 
 object ProductRepository {
-
     fun getProducts(): List<ProductModel> {
         return listOf(
             ProductModel(1, " wireless Headphone", 2500.0, 1999.0, true, 18.0),

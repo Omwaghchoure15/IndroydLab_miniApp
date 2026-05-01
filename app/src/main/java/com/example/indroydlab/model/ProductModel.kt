@@ -8,3 +8,4 @@ data class ProductModel (
     val isDiscounted: Boolean,
     val taxPercent: Double
 )
+

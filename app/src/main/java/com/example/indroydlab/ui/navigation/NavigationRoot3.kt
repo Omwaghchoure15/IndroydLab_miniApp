@@ -50,7 +50,6 @@ fun NavigationRoot(modifier: Modifier = Modifier) {
                 is Routes.ProductScreen -> {
                     NavEntry(key) {
                         ProductScreen(
-                            onCartClick = { backStack.add(Routes.CartScreen) },
                             // FIX: Correctly pass the productId from the screen to the route
                             onProductClick = { id ->
                                 backStack.add(Routes.ProductDetail(productId = id.toString()))
@@ -61,7 +60,7 @@ fun NavigationRoot(modifier: Modifier = Modifier) {
                 is Routes.ProductDetail -> {
                     NavEntry(key) {
                         // key is smart-cast to Routes.ProductDetail here
-                        ProductDetailScreen(productId = key.productId)
+                        ProductDetailScreen( productId = key.productId )
                     }
                 }
                 is Routes.CartScreen -> NavEntry(key) {

@@ -19,6 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.airbnb.lottie.compose.*
 import com.example.indroydlab.R
 import com.example.indroydlab.model.CartItem
+import com.example.indroydlab.ui.shared.card.CartItemCard
 import com.example.indroydlab.ui.theme.IndroydLabTheme
 import com.example.indroydlab.ui.viewmodel.CartViewModel
 import kotlinx.coroutines.delay
@@ -102,76 +103,9 @@ fun CartScreen(viewModel: CartViewModel) {
     }
 }
 
-@SuppressLint("DefaultLocale")
-@Composable
-fun CartItemCard(
-    item: CartItem,
-    onIncrease: () -> Unit,
-    onDecrease: () -> Unit,
-    onRemove: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(3.dp)
-    ) {
-        Column(modifier = Modifier
-            .padding(12.dp)
-            .background(MaterialTheme.colorScheme.background)
-        ) {
-            Text(text = item.product.name, fontSize = 16.sp)
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Text(text = "Price: ₹${String.format("%.2f", item.product.originalPrice)}")
-            Text(text = "Quantity: ${item.quantity}")
-            Text(
-                text = "Tax: ${item.product.taxPercent}%",
-                color = Color.Red
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-
-                    IconButton(onClick = onDecrease) {
-                        Text("−", fontSize = 20.sp)
-                    }
-
-                    Text(
-                        text = item.quantity.toString(),
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
-
-                    IconButton(onClick = onIncrease) {
-                        Text("+", fontSize = 20.sp)
-                    }
-                }
-
-                TextButton(onClick = onRemove) {
-                    Text("Remove", color = MaterialTheme.colorScheme.error)
-                }
-            }
-        }
-    }
-}
-
 
 @Composable
-fun PriceSummary(
-    viewModel: CartViewModel
-) {
-    val subTotal = remember { viewModel.getSubTotal() }
-    val taxTotal = remember { viewModel.getTaxTotal() }
-    val discount = remember { viewModel.getCouponDiscount() }
-    val finalAmount = remember { viewModel.getFinalAmount() }
-
+fun PriceSummary(cartViewModel: CartViewModel) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -181,18 +115,14 @@ fun PriceSummary(
             Text(text = "Minimum Checkout Amount ₹1000",
                 fontSize = 18.sp,
                 color = MaterialTheme.colorScheme.tertiary)
-
-            SummaryRow("Subtotal", subTotal)
-            SummaryRow("Tax", taxTotal)
-            SummaryRow("Coupon Discount", -discount)
-
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 6.dp)
-            )
+            SummaryRow("Subtotal", cartViewModel.getSubTotal())
+            SummaryRow("Tax", cartViewModel.getTaxTotal())
+            SummaryRow("Coupon Discount", cartViewModel.getCouponDiscount())
+            HorizontalDivider ( modifier = Modifier.padding(vertical = 6.dp) )
 
             SummaryRow(
                 label = "Final Amount",
-                value = finalAmount,
+                value = cartViewModel.getFinalAmount(),
                 isBold = true
             )
         }

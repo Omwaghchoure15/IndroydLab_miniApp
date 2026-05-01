@@ -1,7 +1,9 @@
-package com.example.indroydlab.ui.shared
+package com.example.indroydlab.ui.shared.card
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,26 +14,26 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.indroydlab.model.ProductModel
 import com.example.indroydlab.ui.theme.IndroydLabTheme
-import com.example.indroydlab.ui.viewmodel.CartViewModel
 
 @Composable
 fun ProductCard(
     product: ProductModel,
-    cartViewModel: CartViewModel,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    addToCart:() -> Unit
 ) {
+
     Card(modifier = Modifier
         .fillMaxWidth()
-        .clickable{ onClick() },
+        .clickable { onClick() },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -39,26 +41,28 @@ fun ProductCard(
             Text(text = product.name, fontSize = 16.sp)
 
             Spacer(modifier = Modifier.height(6.dp))
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
 
-            if (product.isDiscounted) {
-                Text(
-                    text = "₹${product.originalPrice}",
-                    style = TextStyle(textDecoration = TextDecoration.LineThrough)
-                )
-                Text(
-                    text = "₹${product.discountedPrice}",
-                    color = colorScheme.secondary,
-                )
-            } else {
-                Text(text = "₹${product.originalPrice}")
+                if (product.discountedPrice != null) {
+                    Text(
+                        text = "₹${product.discountedPrice}",
+                        color = colorScheme.secondary,
+                    )
+
+                    Text( text = "₹${product.originalPrice}" )
+
+                } else { Text(text = "₹${product.originalPrice}") }
+
+                Text(text = "Tax: ${product.taxPercent}%", color = colorScheme.tertiary)
             }
-
-            Text(text = "Tax: ${product.taxPercent}%", color = colorScheme.tertiary)
 
             Spacer(modifier = Modifier.height(10.dp))
 
             Button(
-               onClick = { cartViewModel.addToCart(product) },
+               onClick = addToCart ,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Add to Cart")
@@ -70,12 +74,12 @@ fun ProductCard(
 @Preview(showBackground = true)
 @Composable
 fun ProductCardPreview(){
-    val product = ProductModel(1, " wireless Headphone", 2500.0, 1999.0, true, 18.0)
+    val product = ProductModel(1, " wireless Headphone", 2500.0, 1999.0,18.0)
     IndroydLabTheme{
         ProductCard(
             product = product,
-            cartViewModel = viewModel(),
-            onClick = { }
+            onClick = { },
+            addToCart = { }
         )
     }
 }

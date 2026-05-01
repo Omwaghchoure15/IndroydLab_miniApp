@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.indroydlab.ui.shared.ProductCard
+import com.example.indroydlab.ui.shared.card.ProductCard
 import com.example.indroydlab.ui.shared.topbar.TopbarApp
 import com.example.indroydlab.ui.theme.IndroydLabTheme
 import com.example.indroydlab.ui.viewmodel.CartViewModel
@@ -24,7 +24,6 @@ import com.example.indroydlab.ui.viewmodel.ProductViewModel
 
 @Composable
 fun ProductScreen(
-    onCartClick: () -> Unit,
     onProductClick: (Int) -> Unit
 ) {
     val productViewModel: ProductViewModel = viewModel()
@@ -57,8 +56,8 @@ fun ProductScreen(
                     ){ products ->
                         ProductCard(
                             product = products,
-                            cartViewModel = cartViewModel,
-                            onClick ={ onProductClick(products.id)}
+                            onClick ={ onProductClick(products.id)},
+                            addToCart = { cartViewModel.addToCart(products)}
                         )
                     }
                 }
@@ -73,7 +72,6 @@ fun ProductScreen(
 fun ProductScreenPreview() {
     IndroydLabTheme {
         ProductScreen(
-            onCartClick = { },
             onProductClick = { }
         )
     }
